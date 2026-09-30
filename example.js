@@ -61,3 +61,13 @@ Network Response
 Cache    Browser
 
          
+const networkResponse = await fetch(event.request);
+
+const cacheResponse = networkResponse.clone();
+
+await cache.put(
+  event.request,
+  cacheResponse
+);
+
+return networkResponse;
