@@ -30,3 +30,34 @@ const response = await fetch(event.request);
 await cache.put(event.request, response.clone());
 
 return response;
+
+//
+Why do we need response.clone()?
+
+This is one of the most important things to understand deeply.
+
+A response contains a body stream.
+
+Conceptually:
+
+Response
+├── status
+├── headers
+└── body → stream
+
+When you do:
+return response;
+
+you can run into a problem because you're attempting 
+  to consume the same response body for two purposes.
+We want:
+Network Response
+       │
+       ▼
+   clone()
+    /   \
+   /     \
+  ▼       ▼
+Cache    Browser
+
+         
