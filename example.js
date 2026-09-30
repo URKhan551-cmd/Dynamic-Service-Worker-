@@ -71,3 +71,39 @@ await cache.put(
 );
 
 return networkResponse;
+
+
+
+  // let's implement the actual service workers 
+const DYNAMIC_CACHE = "dynamic-v1";
+
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+
+  if (request.method !== "GET") {
+    return;
+  }
+
+  event.respondWith(handleRequest(request));
+});
+
+async function handleRequest(request) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+
+  const cachedResponse = await cache.match(request);
+
+  if (cachedResponse) {
+    console.log("CACHE HIT:", request.url);
+    return cachedResponse;
+  }
+
+console.log("CACHE MISS:", request.url);
+
+  const networkResponse = await fetch(request);
+
+  await cache.put(request, networkResponse.clone());
+
+  return networkResponse;
+}
+
+Then test one new resource that wasn't in your install-time cache.
